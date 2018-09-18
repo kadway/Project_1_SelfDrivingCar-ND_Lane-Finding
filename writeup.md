@@ -2,38 +2,28 @@
 
 ## Writeup report
 
-[//]: # (## **Finding Lane Lines on the Road**)
-
 ---
-
-
 The goals / steps of this project are the following:
 * Make a pipeline that finds lane lines on the road
-* Reflect on your work in a written report
-
-[//]: # (This may be the most platform independent comment)
-
-[Final]: ./test_images_output/6.final_solidWhiteCurve.jpg "Identified lanes"
+* Reflect on the work in a written report
 
 ---
-
-### Reflection
 
 ### 1. Pipeline description
 
 My pipeline consisted 5 main steps: 
 First, I converted the images to grayscale:
-[Gray]: ./test_images_output/1.gray_solidWhiteCurve.jpg "Grayscale image"
+![Gray](/test_images_output/1.gray_solidWhiteCurve.jpg)
 
 I then applied a Gaussian filter to smooth the image in order to remove the noise:
-[Gauss]: ./test_images_output/2.gauss_solidWhiteCurve.jpg "Gaussian smoothing"
+![Gauss](/test_images_output/2.gauss_solidWhiteCurve.jpg)
 
 The resulting image was then used as input to the Canny edge detector algorithm, which finds where in the image the pixels have the highest gradient. The output is a black image with the detected high gradient pixels now representing the edges.
-[Canny]: ./test_images_output/3.canny_solidWhiteCurve.jpg "Canny edge detector"
+![Canny](test_images_output/3.canny_solidWhiteCurve.jpg)
 
 With the the edges of the image detected, then a mask was applied.
 It consisted of creating a polygon whose interior, when overlaped with the image with the detected edges, would define the relevant content to be further processed, meaning a delimitating of the image space where I know the lane lines would be.
-[Masked Edges]: ./test_images_output/4.masked_edges_solidWhiteCurve.jpg "Masked edges"
+![Masked Edges](/test_images_output/4.masked_edges_solidWhiteCurve.jpg)
 
 Next step was to use the masked detected egdes as an input to the Hough Transform.
 The Hough transform gives the x,y points of all the lines detected.
@@ -45,23 +35,37 @@ With vx and vy was posible to calculate the slope of the fitted line (vy/vx = m)
 At this point the equation of the line (y = m.x + b) was known and could be used to find any coordinate of it.
 The x points were calculated for the minimum y point found on the lines and for the edge of the image which was the highest y value.
 The lines were then drawn:
-[Hough]: ./test_images_output/5.hough_solidWhiteCurve.jpg "Hough drawn lines"
+![Hough](/test_images_output/5.hough_solidWhiteCurve.jpg)
 
 The lines were then applied to the original image:
 
 ![Final](/test_images_output/6.final_solidWhiteCurve.jpg)
 
 
-### 2. Identify potential shortcomings with your current pipeline
+### 2. Potential shortcomings with the current pipeline
+
+The pipeline was prepared to avoid crashing whenever a line is not detected and therefore the calculation is not processed further.
+This decision may lead to frames of the video where the lines are not drawn.
+
+Another shortcoming could be the fact that the detected slopes are being limited to a value that allows for a rough predition of the lines in the provided test videos. However for the challenge video it could be seen that for identifying curved line lanes this slope limitation is not a good approach because the slopes may be very diferent along the same lane.
+
+Bad visibility of the lanes in the image may lead to poor edge detection.
+
+The code only identifies two lanes at a time. For good and clear images sould be possible to also know where the other parallel lane lines are.
+
+### 3. Possible improvements to the pipeline
+
+An improvement to the pipeline would be to modify the draw lines function to detect curved lines.
+One way to do it could be by separating the lines with diferent slopes and instead of categorizing them to be either left or right lanes, they should be processed according to their position in the image. For a curved line, the function could draw two or more lines instead of only one. It would know the minimum y point of the line with a determined slope and therefore know where the next line with diferent slope would have to begin.
+
+Another improvement would be to have a predition of the lane lines for the cases where intermitent and subsequent frames of the video don't have the processed image returning any good results. This would also avoid not having the lanes drawn in any short period of the video.
 
 
-One potential shortcoming would be what would happen when ... 
+### Reflection
 
-Another shortcoming could be ...
+This project was a good introduction to the topic computer vision.
+It allowed me to put into practice the tools and concepts explained in the classes.
+It served also as a good refresher for the maths involved and the python programming.
+Additionaly it also opened my mind for what type of problems we find when we want the computer to see and understand the world around us. That being said, it motivated me to be creative in finding solutions to improve what the computer sees.
 
 
-### 3. Suggest possible improvements to your pipeline
-
-A possible improvement would be to ...
-
-Another potential improvement could be to ...
